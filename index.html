@@ -10,20 +10,13 @@
           font-size: 20px;
         }
     </style>
-  </head>
-  <body style="{ font-face: sans-serif; }">
     <script src="jpgsquash.js"></script>
     <script>
       var wasm_loaded = false;
       Module.onRuntimeInitialized = function() { wasm_loaded = true; }
-      function squash_jpg_blob(source, quality) {
-        if (!wasm_loaded) {
-          return undefined;
-        }
-        return Module._jpg_transcode(source, quality);
-      }
     </script>
-
+  </head>
+  <body style="{ font-face: sans-serif; }">
     <input type="file" id="files" name="files[]"/>
     <input type="range" min="1" max="100" value="5" step="1" id="myRange">
     <div style="display:inline"><span>&nbsp;</span>Q:&nbsp;<span id="qual">5</span>&nbsp;==&nbsp;<span id="sizekb">0</span>&nbsp;kBytes
