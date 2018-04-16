@@ -16,11 +16,16 @@
     <script>
       var wasm_loaded = false;
       Module.onRuntimeInitialized = function() { wasm_loaded = true; }
-      function squash_jpg_blob(source, quality) {
-        if (!wasm_loaded) {
+      function squash_jpeg_arraybuf(imgAsArray, quality) {
+        if (!wasm_loaded)
           return undefined;
-        }
-        return Module._jpg_transcode(source, quality);
+        var len = imgAsArray.byteLength;
+        var buf = Module._malloc(len);
+        Module.HEAPU8.set(new Uint8Array(imgAsArray), buf);
+        var size = Module._jpg_transcode(buf, len, quality);
+        resultArray = new Uint8Array(Module.HEAPU8.buffer, buf, size);
+        Module._free(buf);
+        return resultArray;
       }
     </script>
 

@@ -116,17 +116,10 @@ function set_blob(blob) {
 }
 
 function set_right_array(imgAsArray, name) {
-    if (wasm_loaded == false)
-        return;
-    var len = imgAsArray.byteLength;
-    var buf = Module._malloc(len);
-    Module.HEAPU8.set(new Uint8Array(imgAsArray), buf);
-    var size = Module._jpg_transcode(buf, len, gQuality);
-    var result = new Uint8Array(Module.HEAPU8.buffer, buf, len);
-    urlfile = makeBlobUrl(result);
+    resultArray = squash_jpeg_arraybuf(imgAsArray, gQuality)
+    urlfile = makeBlobUrl(resultArray);
     set_right(name);
-    sizekb.innerHTML = "" + (size / 1024.0).toFixed(2);
-    Module._free(buf);
+    sizekb.innerHTML = "" + (resultArray.byteLength / 1024.0).toFixed(2);
 }
 
 function set_jpeg_quality(quality) {
