@@ -15,9 +15,9 @@
 #
 IJG_DIR=third_party/jpeg-7
 
-IJG_SRCS =\
-	$(IJG_DIR)/jaricom.c $(IJG_DIR)/jcapimin.c $(IJG_DIR)/jcapistd.c \
-	$(IJG_DIR)/jcarith.c $(IJG_DIR)/jccoefct.c $(IJG_DIR)/jccolor.c \
+IJG_SRCS=\
+        $(IJG_DIR)/jaricom.c $(IJG_DIR)/jcapimin.c $(IJG_DIR)/jcapistd.c \
+        $(IJG_DIR)/jcarith.c $(IJG_DIR)/jccoefct.c $(IJG_DIR)/jccolor.c \
         $(IJG_DIR)/jcdctmgr.c $(IJG_DIR)/jchuff.c $(IJG_DIR)/jcinit.c \
         $(IJG_DIR)/jcmainct.c $(IJG_DIR)/jcmarker.c $(IJG_DIR)/jcmaster.c \
         $(IJG_DIR)/jcomapi.c $(IJG_DIR)/jcparam.c $(IJG_DIR)/jcprepct.c \
@@ -32,16 +32,32 @@ IJG_SRCS =\
         $(IJG_DIR)/jidctfst.c $(IJG_DIR)/jidctint.c $(IJG_DIR)/jquant1.c \
         $(IJG_DIR)/jquant2.c $(IJG_DIR)/jutils.c $(IJG_DIR)/jmemmgr.c \
         $(IJG_DIR)/jmemansi.c
+IJG_OBJS=$(IJG_SRCS:.c=.o)
 
-SRCS=$(IJG_SRCS) jpgglue.c jpgtranscode.c
+SRCS=jpgglue.c jpgtranscode.c
+OBJS=$(SRCS:.c=.o)
+
+CFLAGS=-s WASM=1
+LDFLAGS=-s ALLOW_MEMORY_GROWTH=1 \
+	-s EXPORTED_FUNCTIONS="['_jpg_transcode']"
 
 all: jpgsquash.js
 
-jpgsquash.js: $(SRCS) Makefile
-	emcc -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 \
-		-s EXPORTED_FUNCTIONS="['_jpg_transcode']" \
-		-Wno-shift-negative-value \
-		-o jpgsquash.js $(SRCS)
+clean:
+	rm -f $(OBJS) $(IJG_OBJS) jpgsquash.js libjpeg.a jpgsquash.wasm
+
+.c.o:
+	emcc -c $(CFLAGS) $(CPPFLAGS) -o $@ $<
+
+libjpeg.a: $(IJG_OBJS)
+	rm -f $@
+	emar cr $@ $^
+
+jpgsquash.js: $(OBJS) libjpeg.a Makefile
+	emcc $(CFLAGS) $(LDFLAGS) -L. -o $@ $(OBJS) -ljpeg
 
 transcode: $(SRCS) main.c
-	cc -o transcode $(SRCS) main.c
+	$(CC) -o transcode $(SRCS) main.c
+
+run: jpgsquash.js
+	emrun --no_browser --port 8000 .

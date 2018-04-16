@@ -1,0 +1,4 @@
+*.o
+jpgsquash.js
+jpgsquash.wasm
+libjpeg.a
