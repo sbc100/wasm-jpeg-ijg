@@ -12,28 +12,6 @@
     </style>
   </head>
   <body style="{ font-face: sans-serif; }">
-    <script src="jpgsquash.js"></script>
-    <script>
-      var wasm_loaded = false;
-
-      Module.onRuntimeInitialized = function() {
-        wasm_loaded = true;
-        set_jpeg_quality(gQuality);
-      }
-
-      function squash_jpeg_arraybuf(imgAsArray, quality) {
-        if (!wasm_loaded)
-          return imgAsArray;
-        var len = imgAsArray.byteLength;
-        var buf = Module._malloc(len);
-        Module.HEAPU8.set(new Uint8Array(imgAsArray), buf);
-        var size = Module._jpg_transcode(buf, len, quality);
-        resultArray = new Uint8Array(Module.HEAPU8.buffer, buf, size);
-        Module._free(buf);
-        return resultArray;
-      }
-    </script>
-
     <input type="file" id="files" name="files[]"/>
     <input type="range" min="1" max="100" value="5" step="1" id="myRange">
     <div style="display:inline"><span>&nbsp;</span>Q:&nbsp;<span id="qual">5</span>&nbsp;==&nbsp;<span id="sizekb">0</span>&nbsp;kBytes

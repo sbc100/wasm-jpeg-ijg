@@ -14,7 +14,6 @@
 # the License.
 #
 
-
 SRCS=jpgglue.c jpgtranscode.c
 OBJS=$(SRCS:.c=.o)
 
@@ -24,26 +23,10 @@ LDFLAGS=-s WASM=1 -s ALLOW_MEMORY_GROWTH=1 \
 all: jpgsquash.js
 
 clean:
-	rm -f $(OBJS) jpgsquash.js libjpeg.a jpgsquash.wasm
+	rm -f $(OBJS) jpgsquash.js jpgsquash.wasm
 
-jpegsrc.v7.tar.gz:
-	wget http://www.ijg.org/files/jpegsrc.v7.tar.gz
-
-jpeg-7: jpegsrc.v7.tar.gz
-	tar xvf jpegsrc.v7.tar.gz
-
-%.o: %.c libjpeg.a
+%.o: %.c
 	emcc -c -Ijpeg-7 $(CFLAGS) $(CPPFLAGS) -o $@ $<
-
-libjpeg.a: jpeg-7
-	cd jpeg-7 && emconfigure ./configure && make -j8
-	cp jpeg-7/.libs/libjpeg.a .
 
 jpgsquash.js: $(OBJS) Makefile
 	emcc $(CFLAGS) $(LDFLAGS) -Ljpeg-7/.libs -o $@ $(OBJS) -ljpeg
-
-transcode: $(SRCS) main.c
-	$(CC) -o transcode $(SRCS) main.c
-
-run: jpgsquash.js
-	emrun --no_browser --port 8000 .
