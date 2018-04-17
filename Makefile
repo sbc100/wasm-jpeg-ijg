@@ -47,5 +47,3 @@ transcode: $(SRCS) main.c
 
 run: jpgsquash.js
 	emrun --no_browser --port 8000 .
-
-
