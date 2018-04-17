@@ -30,7 +30,7 @@
 #include "jpeglib.h"
 #include "jerror.h"
 
-#include "jpgtranscode-priv.h"
+#include "jpgglue.h"
 
 #ifndef SIZEOF
 #define SIZEOF(a)        sizeof(a)

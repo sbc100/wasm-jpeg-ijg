@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "jpgtranscode-priv.h"
+#include "jpgglue.h"
 
 /*
  * NB: This overwrites 'buffer'
