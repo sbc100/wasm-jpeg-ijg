@@ -13,26 +13,7 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 #
-IJG_DIR=third_party/jpeg-7
 
-IJG_SRCS=\
-        $(IJG_DIR)/jaricom.c $(IJG_DIR)/jcapimin.c $(IJG_DIR)/jcapistd.c \
-        $(IJG_DIR)/jcarith.c $(IJG_DIR)/jccoefct.c $(IJG_DIR)/jccolor.c \
-        $(IJG_DIR)/jcdctmgr.c $(IJG_DIR)/jchuff.c $(IJG_DIR)/jcinit.c \
-        $(IJG_DIR)/jcmainct.c $(IJG_DIR)/jcmarker.c $(IJG_DIR)/jcmaster.c \
-        $(IJG_DIR)/jcomapi.c $(IJG_DIR)/jcparam.c $(IJG_DIR)/jcprepct.c \
-        $(IJG_DIR)/jcsample.c $(IJG_DIR)/jctrans.c $(IJG_DIR)/jdapimin.c \
-        $(IJG_DIR)/jdapistd.c $(IJG_DIR)/jdarith.c $(IJG_DIR)/jdatadst.c \
-        $(IJG_DIR)/jdatasrc.c $(IJG_DIR)/jdcoefct.c $(IJG_DIR)/jdcolor.c \
-        $(IJG_DIR)/jddctmgr.c $(IJG_DIR)/jdhuff.c $(IJG_DIR)/jdinput.c \
-        $(IJG_DIR)/jdmainct.c $(IJG_DIR)/jdmarker.c $(IJG_DIR)/jdmaster.c \
-        $(IJG_DIR)/jdmerge.c $(IJG_DIR)/jdpostct.c $(IJG_DIR)/jdsample.c \
-        $(IJG_DIR)/jdtrans.c $(IJG_DIR)/jerror.c $(IJG_DIR)/jfdctflt.c \
-        $(IJG_DIR)/jfdctfst.c $(IJG_DIR)/jfdctint.c $(IJG_DIR)/jidctflt.c \
-        $(IJG_DIR)/jidctfst.c $(IJG_DIR)/jidctint.c $(IJG_DIR)/jquant1.c \
-        $(IJG_DIR)/jquant2.c $(IJG_DIR)/jutils.c $(IJG_DIR)/jmemmgr.c \
-        $(IJG_DIR)/jmemansi.c
-IJG_OBJS=$(IJG_SRCS:.c=.o)
 
 SRCS=jpgglue.c jpgtranscode.c
 OBJS=$(SRCS:.c=.o)
@@ -43,20 +24,28 @@ LDFLAGS=-s WASM=1 -s ALLOW_MEMORY_GROWTH=1 \
 all: jpgsquash.js
 
 clean:
-	rm -f $(OBJS) $(IJG_OBJS) jpgsquash.js libjpeg.a jpgsquash.wasm
+	rm -f $(OBJS) jpgsquash.js libjpeg.a jpgsquash.wasm
 
-.c.o:
-	emcc -c $(CFLAGS) $(CPPFLAGS) -o $@ $<
+jpegsrc.v7.tar.gz:
+	wget http://www.ijg.org/files/jpegsrc.v7.tar.gz
 
-libjpeg.a: $(IJG_OBJS)
-	rm -f $@
-	emar cr $@ $^
+jpeg-7: jpegsrc.v7.tar.gz
+	tar xvf jpegsrc.v7.tar.gz
 
-jpgsquash.js: $(OBJS) libjpeg.a Makefile
-	emcc $(CFLAGS) $(LDFLAGS) -L. -o $@ $(OBJS) -ljpeg
+%.o: %.c libjpeg.a
+	emcc -c -Ijpeg-7 $(CFLAGS) $(CPPFLAGS) -o $@ $<
+
+libjpeg.a: jpeg-7
+	cd jpeg-7 && emconfigure ./configure && make -j8
+	cp jpeg-7/.libs/libjpeg.a .
+
+jpgsquash.js: $(OBJS) Makefile
+	emcc $(CFLAGS) $(LDFLAGS) -Ljpeg-7/.libs -o $@ $(OBJS) -ljpeg
 
 transcode: $(SRCS) main.c
 	$(CC) -o transcode $(SRCS) main.c
 
 run: jpgsquash.js
 	emrun --no_browser --port 8000 .
+
+

@@ -27,8 +27,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "third_party/jpeg-7/jpeglib.h"
-#include "third_party/jpeg-7/jerror.h"
+#include "jpeglib.h"
+#include "jerror.h"
 
 #include "jpgtranscode-priv.h"
 

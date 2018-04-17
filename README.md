@@ -2,6 +2,8 @@
 
 In-browser JPEG Codec demo for experimenting with different quality settings.
 
+Based on http://www.ijg.org/files/jpegsrc.v7.tar.gz.
+
 ## Prerequisites:
 * Installed emscripten SDK, available at https://github.com/juj/emsdk
 * some version of 'make' installed
@@ -11,7 +13,8 @@ In-browser JPEG Codec demo for experimenting with different quality settings.
 make
 ```
 
-This will generate 'jpegsquash.js' and 'jpegsquash.wasm'. Load 'index.html' from a local web server and enjoy!
+This will generate 'jpegsquash.js' and 'jpegsquash.wasm'. Load 'index.html'
+from a local web server and enjoy!
 
 ## To build test harness:
 ```
