@@ -1,4 +1,5 @@
 *.o
 jpgsquash.js
 jpgsquash.wasm
+jpgsquash.wast
 libjpeg.a
