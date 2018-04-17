@@ -37,9 +37,8 @@ IJG_OBJS=$(IJG_SRCS:.c=.o)
 SRCS=jpgglue.c jpgtranscode.c
 OBJS=$(SRCS:.c=.o)
 
-CFLAGS=-s WASM=1
-LDFLAGS=-s ALLOW_MEMORY_GROWTH=1 \
-	-s EXPORTED_FUNCTIONS="['_jpg_transcode']"
+LDFLAGS=-s WASM=1 -s ALLOW_MEMORY_GROWTH=1 \
+        -s EXPORTED_FUNCTIONS="['_jpg_transcode']"
 
 all: jpgsquash.js
 
