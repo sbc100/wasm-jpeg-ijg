@@ -15,10 +15,15 @@
     <script src="jpgsquash.js"></script>
     <script>
       var wasm_loaded = false;
-      Module.onRuntimeInitialized = function() { wasm_loaded = true; }
+
+      Module.onRuntimeInitialized = function() {
+        wasm_loaded = true;
+        set_jpeg_quality(gQuality);
+      }
+
       function squash_jpeg_arraybuf(imgAsArray, quality) {
         if (!wasm_loaded)
-          return undefined;
+          return imgAsArray;
         var len = imgAsArray.byteLength;
         var buf = Module._malloc(len);
         Module.HEAPU8.set(new Uint8Array(imgAsArray), buf);
@@ -63,6 +68,7 @@
             return null;
         }
       }
+
       var fileAsArray = undefined;
       function handleFileSelect(evt) {
         var files = evt.target.files; // FileList object
@@ -71,20 +77,15 @@
         if (files[0]) {
           var f = files[0];
           var reader = new FileReader();
-          // Closure to capture the file information.
-          reader.onload = (function(theFile) {
-            return function(e) {
-              var blob = makeBlobUrl(e.target.result);
-              set_blob(blob);
-              fileAsArray = e.target.result;
-              set_right_array(fileAsArray, "&rarr;&nbsp;Q: " + gQuality);
-            };
-          })(f);
+          reader.onload = function(e) {
+            gotImageBuffer(e.target.result);
+          };
 
           // Read in the image file as an array buffer.
           reader.readAsArrayBuffer(f);
         }
       }
+
       document.getElementById('files').addEventListener('change', handleFileSelect, false);
       var qual_text = document.getElementById('qual');
       function handleQualityChange(evt) {

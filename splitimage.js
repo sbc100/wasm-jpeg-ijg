@@ -100,13 +100,21 @@ function set_right(name){
     righttext.innerHTML=name;
 }
 
+function got_image_buffer(arrayBuf) {
+    var blob = makeBlobUrl(arrayBuf);
+    set_blob(blob);
+    fileAsArray = arrayBuf;
+    set_right_array(fileAsArray, "&rarr;&nbsp;Q: " + gQuality);
+}
+
 var gQuality = 5;
 
 function set_file(){
-    urlfile = "images/js-wa-900.jpg";
-    first=1;
-    set_right(gQuality + "");
-    set_left();
+    fetch("images/sunset.jpg").then(function(response) {
+      response.arrayBuffer().then(function(buffer) {
+        got_image_buffer(buffer);
+      });
+    });
 }
 
 function set_blob(blob) {
